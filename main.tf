@@ -18,10 +18,6 @@ resource "exoscale_nic" "priv_interface" {
   ip_address = cidrhost(var.private_network.cidr, lookup(var.private_network, "offset", 10) + count.index)
 }
 
-data "aws_route53_zone" "this" {
-  name = coalesce(var.zone, var.domain)
-}
-
 data "template_cloudinit_config" "config" {
   count = var.instance_count
 
@@ -47,18 +43,6 @@ EOF
     content_type = "text/cloud-config"
     content = "${var.additional_user_data}"
   }
-}
-
-resource "aws_route53_record" "this" {
-  count = var.instance_count
-
-  zone_id = data.aws_route53_zone.this.id
-  name = format("%s.%s", exoscale_compute.this[count.index].name, var.domain)
-  type = "A"
-  ttl = "30"
-  records = [
-    exoscale_nic.priv_interface[count.index].ip_address
-  ]
 }
 
 resource "exoscale_compute" "this" {
