@@ -52,7 +52,7 @@ EOF
 resource "aws_route53_record" "this" {
   count = var.instance_count
 
-  zone_id = data.aws_route53_zone.zone.id
+  zone_id = data.aws_route53_zone.this.id
   name = format("%s.%s", exoscale_compute.this[count.index].name, var.domain)
   type = "A"
   ttl = "30"
