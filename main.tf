@@ -5,17 +5,17 @@ resource "random_string" "affinity_group_name" {
   special = false
 }
 
-resource "exoscale_affinity" "affinity-group" {
+resource "exoscale_affinity" "affinity_group" {
   name = random_string.affinity_group_name.result
   type = "host anti-affinity"
 }
 
-resource "exoscale_nic" "priv-interface" {
-  count = var.instance_count
+resource "exoscale_nic" "priv_interface" {
+  count = var.private_network != null ? var.instance_count : 0
 
   compute_id = exoscale_compute.this[count.index].id
-  network_id = var.private_network
-  ip_address = cidrhost(var.private_network_cidr, var.private_network_offset + count.index)
+  network_id = var.private_network.name
+  ip_address = cidrhost(var.private_network.cidr, lookup(var.private_network, "offset", 10) + count.index)
 }
 
 data "aws_route53_zone" "this" {
@@ -57,7 +57,7 @@ resource "aws_route53_record" "this" {
   type = "A"
   ttl = "30"
   records = [
-    exoscale_nic.priv-interface[count.index].ip_address
+    exoscale_nic.priv_interface[count.index].ip_address
   ]
 }
 
@@ -72,7 +72,7 @@ resource "exoscale_compute" "this" {
   template = var.template
   zone = var.region
   affinity_groups = [
-    exoscale_affinity.affinity-group.name
+    exoscale_affinity.affinity_group.name
   ]
   user_data = "${data.template_cloudinit_config.config[count.index].rendered}"
 

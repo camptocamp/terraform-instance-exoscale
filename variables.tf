@@ -47,9 +47,13 @@ variable "root_disk_size" {
   default = 10
 }
 
-variable "private_network_offset" {
-  type    = number
-  default = 10
+variable "private_network" {
+  type = object({
+    name   = string
+    cidr   = string
+    offset = number
+  })
+  default = null
 }
 
 variable "tags" {
