@@ -14,7 +14,7 @@ resource "exoscale_nic" "priv_interface" {
   count = var.private_network != null ? var.instance_count : 0
 
   compute_id = exoscale_compute.this[count.index].id
-  network_id = var.private_network.name
+  network_id = var.private_network.id
   ip_address = cidrhost(var.private_network.cidr, lookup(var.private_network, "offset", 10) + count.index)
 }
 
