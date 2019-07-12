@@ -17,5 +17,8 @@ output "this_instance_public_ipv6" {
 
 output "this_instance_hostname" {
   description = "Instance's hostname"
-  value       = format("%s.%s", exoscale_compute.this.*.name, var.domain)
+  value = [
+    for instance_name in exoscale_compute.this[*].name :
+    format("%s.%s", instance_name, var.domain)
+  ]
 }
