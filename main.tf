@@ -77,7 +77,7 @@ module "puppet-node" {
   instances = [
     for i in range(length(exoscale_compute.this)) :
     {
-      hostname = exoscale_compute.this[i].name
+      hostname = format("%s.%s", exoscale_compute.this[i].name, var.domain)
       connection = {
         host = exoscale_compute.this[i].ip_address
       }
@@ -103,7 +103,7 @@ module "rancher-host" {
   instances = [
     for i in range(length(exoscale_compute.this)) :
     {
-      hostname = exoscale_compute.this[i].name
+      hostname = format("%s.%s", exoscale_compute.this[i].name, var.domain)
       agent_ip = exoscale_compute.this[i].ip_address
       connection = {
         host = exoscale_compute.this[i].ip_address
