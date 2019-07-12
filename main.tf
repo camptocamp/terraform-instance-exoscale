@@ -49,7 +49,7 @@ resource "exoscale_compute" "this" {
   count = var.instance_count
 
   key_pair = var.key_pair
-  display_name = var.display_name
+  display_name = format("%s-%s", var.display_name, count.index)
   disk_size = var.root_disk_size
   security_groups = var.security_groups
   size = var.size
