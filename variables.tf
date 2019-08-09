@@ -62,6 +62,11 @@ variable "tags" {
   default = {}
 }
 
+variable "connection" {
+  type    = map(string)
+  default = null
+}
+
 ##########
 # Rancher
 
