@@ -49,7 +49,7 @@ resource "exoscale_compute" "this" {
   count = var.instance_count
 
   key_pair = var.key_pair
-  display_name = format("%s-%s", var.display_name, count.index)
+  display_name = var.display_name != "" ? format("%s-%s", var.display_name, count.index) : format("ip-%s", join("-", split(".", cidrhost(var.private_network.cidr, var.private_network.offset + count.index))))
   disk_size = var.root_disk_size
   security_groups = var.security_groups
   size = var.size
@@ -79,8 +79,8 @@ module "puppet-node" {
     {
       hostname = format("%s.%s", exoscale_compute.this[i].name, var.domain)
       connection = {
-        host = lookup(var.connection, var.connection.host, exoscale_compute.this[i].ip_address)
-        private_key = lookup(var.connection, var.connection.private_key, null)
+        host = lookup(var.connection, "host", exoscale_compute.this[i].ip_address)
+        private_key = lookup(var.connection, "private_key", null)
       }
     }
   ]
@@ -107,8 +107,8 @@ module "rancher-host" {
       hostname = format("%s.%s", exoscale_compute.this[i].name, var.domain)
       agent_ip = exoscale_compute.this[i].ip_address
       connection = {
-        host = lookup(var.connection, var.connection.host, exoscale_compute.this[i].ip_address)
-        private_key = lookup(var.connection, var.connection.private_key, null)
+        host = lookup(var.connection, "host", exoscale_compute.this[i].ip_address)
+        private_key = lookup(var.connection, "private_key", null)
       }
 
       host_labels = merge(

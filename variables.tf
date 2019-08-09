@@ -14,6 +14,7 @@ variable "security_groups" {
 
 variable "display_name" {
   type = string
+  default = ""
 }
 
 variable "size" {
