@@ -22,3 +22,8 @@ output "this_instance_hostname" {
     format("%s.%s", instance_name, var.domain)
   ]
 }
+
+output "this_instance_private_ipv4" {
+  description = "Instance's private IPv4"
+  value = exoscale_nic.priv_interface.*.ip_address
+}
