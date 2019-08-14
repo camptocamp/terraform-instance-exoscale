@@ -13,7 +13,7 @@ variable "security_groups" {
 }
 
 variable "display_name" {
-  type = string
+  type    = string
   default = ""
 }
 
@@ -65,7 +65,7 @@ variable "tags" {
 
 variable "connection" {
   type    = map(string)
-  default = null
+  default = {}
 }
 
 ##########
