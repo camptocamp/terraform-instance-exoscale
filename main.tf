@@ -8,6 +8,10 @@ resource "random_string" "affinity_group_name" {
 resource "exoscale_affinity" "affinity_group" {
   name = random_string.affinity_group_name.result
   type = "host anti-affinity"
+
+  lifecycle {
+    ignore_changes = ["description"]
+  }
 }
 
 resource "exoscale_nic" "priv_interface" {
