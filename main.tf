@@ -19,7 +19,6 @@ resource "exoscale_nic" "priv_interface" {
 
   compute_id = exoscale_compute.this[count.index].id
   network_id = var.private_network.id
-  ip_address = cidrhost(var.private_network.cidr, lookup(var.private_network, "offset", 10) + count.index)
 }
 
 data "template_cloudinit_config" "config" {
@@ -53,7 +52,7 @@ resource "exoscale_compute" "this" {
   count = var.instance_count
 
   key_pair        = var.key_pair
-  display_name    = var.display_name != "" ? format("%s-%s", var.display_name, count.index) : format("ip-%s", join("-", split(".", cidrhost(var.private_network.cidr, var.private_network.offset + count.index))))
+  display_name    = var.instance_count == 1 ? var.display_name : format("%s-%s", var.display_name, count.index)
   disk_size       = var.root_disk_size
   security_groups = var.security_groups
   size            = var.size
@@ -112,7 +111,9 @@ resource "null_resource" "provisioner" {
       diff   = true
       check  = var.ansible_check
 
-      extra_vars = {}
+      extra_vars = {
+        eth1_address = var.private_network != null ? format("%s/%s", cidrhost(var.private_network.cidr, lookup(var.private_network, "offset", 10) + count.index), cidrnetmask(var.private_network.cidr)) : null
+      }
     }
   }
 }
