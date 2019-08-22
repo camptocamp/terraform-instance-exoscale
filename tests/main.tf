@@ -21,16 +21,24 @@ module "instance" {
   source         = "../"
   instance_count = var.instance_count
 
-  key_pair      = var.key_pair
-  instance_name = "terraform-instance-exoscale-test"
-  domain        = "internal"
+  key_pair     = var.key_pair
+  display_name = "terraform-instance-exoscale-test"
+  domain       = "internal"
 
   security_groups = [
     "allow_c2c"
   ]
 
-  instance_type  = "Small"
-  instance_image = "Linux Ubuntu 16.04 LTS 64-bit"
+  size           = "Small"
+  template       = "Linux Ubuntu 16.04 LTS 64-bit"
   region         = "ch-gva-2"
   root_disk_size = "50"
+
+  puppet = {
+    autosign_psk = data.pass_password.puppet_autosign_psk.data["puppet_autosign_psk"]
+    server       = "puppet.camptocamp.com"
+    caserver     = "puppetca.camptocamp.com"
+    role         = "base"
+    environment  = "staging4"
+  }
 }
