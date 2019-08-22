@@ -68,6 +68,11 @@ variable "connection" {
   default = {}
 }
 
+variable "ansible_check" {
+  type    = bool
+  default = false
+}
+
 ##########
 # Rancher
 
