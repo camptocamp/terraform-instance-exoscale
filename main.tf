@@ -19,7 +19,6 @@ resource "exoscale_nic" "priv_interface" {
 
   compute_id = exoscale_compute.this[count.index].id
   network_id = var.private_network.id
-  ip_address = cidrhost(var.private_network.cidr, lookup(var.private_network, "offset", 10) + count.index)
 }
 
 data "template_cloudinit_config" "config" {
@@ -112,7 +111,9 @@ resource "null_resource" "provisioner" {
       diff   = true
       check  = var.ansible_check
 
-      extra_vars = {}
+      extra_vars = {
+        eth1_address = var.private_network != null ? format("%s/%s", cidrhost(var.private_network.cidr, lookup(var.private_network, "offset", 10) + count.index), cidrnetmask(var.private_network.cidr)) : null
+      }
     }
   }
 }

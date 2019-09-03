@@ -1,1 +1,20 @@
-
+- name: setup additional nic cloudinit config
+  copy:
+    dest: /etc/cloud/cloud.cfg.d/99_exoscale_network.cfg
+    content: |
+      network:
+        version: 1
+        config:
+      {% for interface in hostvars[inventory_hostname]['ansible_interfaces'] %}
+      {% if interface != "lo" %}
+        - type: physical
+          name: {{ interface }}
+          subnets:
+      {% if hostvars[inventory_hostname]['%s_address' | format(interface)] is defined %}
+            - type: static
+              address: {{ hostvars[inventory_hostname]['%s_address' | format(interface)] }}
+      {% else %}
+            - type: dhcp
+      {% endif %}
+      {% endif %}
+      {% endfor %}
