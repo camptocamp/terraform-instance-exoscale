@@ -137,13 +137,13 @@ module "puppet-node" {
     }
   ]
 
-  server_address    = lookup(var.puppet, "server_address", null)
-  server_port       = lookup(var.puppet, "server_port", 443)
-  ca_server_address = lookup(var.puppet, "ca_server_address", null)
-  ca_server_port    = lookup(var.puppet, "ca_server_port", 443)
-  environment       = lookup(var.puppet, "environment", null)
-  role              = lookup(var.puppet, "role", null)
-  autosign_psk      = lookup(var.puppet, "autosign_psk", null)
+  server_address    = var.puppet != null ? lookup(var.puppet, "server_address", null) : null
+  server_port       = var.puppet != null ? lookup(var.puppet, "server_port", 443) : 443
+  ca_server_address = var.puppet != null ? lookup(var.puppet, "ca_server_address", null) : null
+  ca_server_port    = var.puppet != null ? lookup(var.puppet, "ca_server_port", 443) : 443
+  environment       = var.puppet != null ? lookup(var.puppet, "environment", null) : null
+  role              = var.puppet != null ? lookup(var.puppet, "role", null) : null
+  autosign_psk      = var.puppet != null ? lookup(var.puppet, "autosign_psk", null) : null
 
   deps_on = null_resource.provisioner[*].id
 }
