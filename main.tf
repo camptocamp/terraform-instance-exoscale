@@ -73,7 +73,7 @@ resource "exoscale_compute" "this" {
 
 resource "null_resource" "provisioner" {
   count      = var.instance_count
-  depends_on = ["exoscale_compute.this"]
+  depends_on = ["exoscale_compute.this", "exoscale_nic.priv_interface"]
 
   connection {
     type                = lookup(var.connection, "type", null)
