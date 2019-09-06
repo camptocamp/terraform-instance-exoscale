@@ -5,14 +5,15 @@
       network:
         version: 1
         config:
-      {% for interface in hostvars[inventory_hostname]['ansible_interfaces'] %}
-      {% if interface != "lo" %}
+      {% for ifname in hostvars[inventory_hostname]['ansible_interfaces'] %}
+      {% set ifdata = hostvars[inventory_hostname]['ansible_%s' | format(ifname)] %}
+      {% if ifdata['module'] is defined and ifdata['module'] == 'virtio_net' %}
         - type: physical
-          name: {{ interface }}
+          name: {{ ifname }}
           subnets:
-      {% if hostvars[inventory_hostname]['%s_address' | format(interface)] is defined %}
+      {% if hostvars[inventory_hostname]['%s_address' | format(ifname)] is defined %}
             - type: static
-              address: {{ hostvars[inventory_hostname]['%s_address' | format(interface)] }}
+              address: {{ hostvars[inventory_hostname]['%s_address' | format(ifname)] }}
       {% else %}
             - type: dhcp
       {% endif %}
