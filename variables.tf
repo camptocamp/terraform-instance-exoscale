@@ -51,7 +51,6 @@ variable "root_disk_size" {
 variable "private_network" {
   type = object({
     id     = string
-    name   = string
     cidr   = string
     offset = number
   })
