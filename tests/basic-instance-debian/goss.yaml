@@ -1,0 +1,32 @@
+port:
+  tcp:22:
+    listening: true
+    ip:
+    - 0.0.0.0
+  tcp6:22:
+    listening: true
+    ip:
+    - '::'
+
+package:
+  puppet-agent:
+    installed: true
+
+service:
+  puppet:
+    enabled: true
+    running: true
+
+file:
+  /root/.ssh/authorized_keys:
+    exists: true
+    contains:
+      - puppet
+
+interface:
+  eth0:
+    exists: true
+  eth1:
+    exists: true
+    addrs:
+      - 10.10.99.20/24

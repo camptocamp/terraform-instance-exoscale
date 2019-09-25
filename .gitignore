@@ -1,2 +1,3 @@
-tests/.terraform
-tests/terraform.tfstate*
+.terraform
+terraform.tfstate*
+.terraform.tfstate*

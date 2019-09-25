@@ -1,0 +1,78 @@
+---
+image:
+  name: camptocamp/terraform-ci:latest
+
+variables:
+  TF_VAR_key_pair: terraform
+
+before_script:
+  - gpg --import <(echo "$GPG_SECRET_KEY")
+  - gopass clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.camptocamp.com/camptocamp/password-store-terraform.git
+  - gopass clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.camptocamp.com/camptocamp/password-store-terraform.git terraform
+  - mkdir -p ~/.ssh
+  - gopass terraform/ssh/terraform id_rsa > ~/.ssh/id_rsa
+  - gopass terraform/ssh/terraform id_rsa.pub > ~/.ssh/id_rsa.pub
+  - chmod 0600 ~/.ssh/id_rsa
+  - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+  - export NSS_WRAPPER_PASSWD="${HOME}/passwd"
+  - export NSS_WRAPPER_GROUP="${HOME}/group"
+  - echo "terraform:x:$(id -u):$(id -g):Terraform:$HOME:/bin/bash" > "${NSS_WRAPPER_PASSWD}"
+  - echo "terraform:x:$(id -g):" > "${NSS_WRAPPER_GROUP}"
+  - export LD_PRELOAD="/usr/lib/libnss_wrapper.so"
+  - echo -e "[defaults]\ntimeout = 90\n[ssh_connection]\ncontrol_path = none\n" > ~/.ansible.cfg
+
+test-basic-instance:
+  script:
+    - cd tests/basic-instance
+    - tfenv install
+    - summon terraform init
+    - timeout 45m make test || kill -9 `pidof terraform`
+  after_script:
+    - cd tests/basic-instance
+    - make clean
+  only:
+    refs:
+      - master
+      - merge_requests
+
+test-basic-instance-debian:
+  script:
+    - cd tests/basic-instance-debian
+    - tfenv install
+    - summon terraform init
+    - timeout 45m make test || kill -9 `pidof terraform`
+  after_script:
+    - cd tests/basic-instance-debian
+    - make clean
+  only:
+    refs:
+      - master
+      - merge_requests
+
+test-basic-instance-centos:
+  script:
+    - cd tests/basic-instance-centos
+    - tfenv install
+    - summon terraform init
+    - timeout 45m make test || kill -9 `pidof terraform`
+  after_script:
+    - cd tests/basic-instance-centos
+    - make clean
+  only:
+    refs:
+      - master
+      - merge_requests
+
+test-standard-rancher-host:
+  script:
+    - cd tests/standard-rancher-host
+    - tfenv install
+    - summon terraform init
+    - timeout 45m make test || kill -9 `pidof terraform`
+  after_script:
+    - cd tests/standard-rancher-host
+    - make clean
+  only:
+    refs:
+      - master
+      - merge_requests

@@ -27,7 +27,7 @@ output "this_instance_private_ipv4" {
   description = "Instance's private IPv4"
   value = var.private_network != null ? [
     for i in range(var.instance_count) :
-    cidrhost(var.private_network.cidr, lookup(var.private_network, "offset", 10) + i)
+    exoscale_nic.priv_interface[i].ip_address
   ] : null
 }
 
