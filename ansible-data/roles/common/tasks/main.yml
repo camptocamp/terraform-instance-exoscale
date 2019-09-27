@@ -1,3 +1,7 @@
+- name: List physical network interfaces
+  command: find /sys/class/net -type l -not -lname '*virtual*' -printf '%f\n'
+  register: physical_interfaces
+
 - name: setup additional nic cloudinit config
   copy:
     dest: /etc/cloud/cloud.cfg.d/99_exoscale_network.cfg
@@ -5,9 +9,7 @@
       network:
         version: 1
         config:
-      {% for ifname in hostvars[inventory_hostname]['ansible_interfaces'] %}
-      {% set ifdata = hostvars[inventory_hostname]['ansible_%s' | format(ifname)] %}
-      {% if ifdata['module'] is defined and ifdata['module'] == 'virtio_net' %}
+      {% for ifname in physical_interfaces.stdout.split() %}
         - type: physical
           name: {{ ifname }}
           subnets:
@@ -16,6 +18,5 @@
               address: {{ hostvars[inventory_hostname]['%s_address' | format(ifname)] }}
       {% else %}
             - type: dhcp
-      {% endif %}
       {% endif %}
       {% endfor %}
