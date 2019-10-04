@@ -19,8 +19,6 @@ resource "exoscale_nic" "priv_interface" {
 
   compute_id = exoscale_compute.this[count.index].id
   network_id = var.private_network.id
-
-  ip_address = cidrhost(var.private_network.cidr, var.private_network.offset + count.index)
 }
 
 data "template_cloudinit_config" "config" {

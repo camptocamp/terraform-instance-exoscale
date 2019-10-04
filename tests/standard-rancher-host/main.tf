@@ -30,10 +30,6 @@ resource "exoscale_network" "priv_net" {
   name             = "privNetTestingTerraform"
   zone             = "ch-gva-2"
   network_offering = "PrivNet"
-
-  start_ip = "10.10.99.10"
-  end_ip   = "10.10.99.25"
-  netmask  = "255.255.255.0"
 }
 
 module "instance" {
@@ -45,7 +41,6 @@ module "instance" {
 
   private_network = {
     id     = exoscale_network.priv_net.id
-    name   = "privNetTestingTerraform"
     cidr   = "10.10.99.0/24"
     offset = 10
   }
