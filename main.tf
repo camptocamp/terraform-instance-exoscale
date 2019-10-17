@@ -48,6 +48,11 @@ EOF
   }
 }
 
+data "exoscale_compute_template" "this" {
+  zone = var.region
+  name = var.template
+}
+
 resource "exoscale_compute" "this" {
   count = var.instance_count
 
@@ -56,7 +61,7 @@ resource "exoscale_compute" "this" {
   disk_size       = var.root_disk_size
   security_groups = var.security_groups
   size            = var.size
-  template        = var.template
+  template_id     = data.exoscale_compute_template.this.id
   zone            = var.region
   affinity_groups = [
     exoscale_affinity.affinity_group.name
