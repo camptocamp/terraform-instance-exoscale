@@ -72,7 +72,7 @@ resource "exoscale_compute" "this" {
 
   lifecycle {
     ignore_changes = ["user_data", "security_groups", "key_pair", "affinity_groups", "affinity_group_ids",
-      "template_id", # The provider changed the way it manages templates and there's no real backward-compatibility.
+      "template", "template_id", # The provider changed the way it manages templates and there's no real backward-compatibility.
     ]
   }
 }
