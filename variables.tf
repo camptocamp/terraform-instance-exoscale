@@ -34,11 +34,6 @@ variable "domain" {
   type = string
 }
 
-variable "zone" {
-  type    = string
-  default = ""
-}
-
 variable "region" {
   type = string
 }
