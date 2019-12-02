@@ -122,6 +122,11 @@ resource "null_resource" "provisioner" {
         eth1_address = var.private_network != null ? format("%s/%s", cidrhost(var.private_network.cidr, var.private_network.offset + count.index), cidrnetmask(var.private_network.cidr)) : null
       }
     }
+
+    ansible_ssh_settings {
+      connect_timeout_seconds = 60
+      insecure_no_strict_host_key_checking = true
+    }
   }
 }
 
