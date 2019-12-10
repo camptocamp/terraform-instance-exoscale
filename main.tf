@@ -50,7 +50,7 @@ EOF
   part {
     filename     = "additional.sh"
     content_type = "text/x-shellscript"
-    content      = "${var.additional_script}"
+    content      = "${var.additional_user_script}"
   }
 }
 
