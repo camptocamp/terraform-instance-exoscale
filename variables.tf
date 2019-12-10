@@ -30,6 +30,11 @@ variable "additional_user_data" {
   default = "#cloud-config\n"
 }
 
+variable "additional_user_script" {
+  type    = string
+  default = "#! /bin/sh"
+}
+
 variable "domain" {
   type = string
 }

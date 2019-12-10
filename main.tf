@@ -46,6 +46,12 @@ EOF
     content_type = "text/cloud-config"
     content      = "${var.additional_user_data}"
   }
+
+  part {
+    filename     = "additional.sh"
+    content_type = "text/x-shellscript"
+    content      = "${var.additional_script}"
+  }
 }
 
 data "exoscale_compute_template" "this" {
