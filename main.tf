@@ -72,7 +72,7 @@ resource "exoscale_compute" "this" {
   affinity_groups = [
     exoscale_affinity.affinity_group.name
   ]
-  user_data = "${data.template_cloudinit_config.config[count.index].rendered}"
+  user_data = data.template_cloudinit_config.config[count.index].rendered
 
   tags = var.tags
 
@@ -130,7 +130,7 @@ resource "null_resource" "provisioner" {
     }
 
     ansible_ssh_settings {
-      connect_timeout_seconds = 60
+      connect_timeout_seconds              = 60
       insecure_no_strict_host_key_checking = true
     }
   }
