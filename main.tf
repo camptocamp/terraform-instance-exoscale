@@ -10,7 +10,7 @@ resource "exoscale_affinity" "affinity_group" {
   type = "host anti-affinity"
 
   lifecycle {
-    ignore_changes = ["description"]
+    ignore_changes = [description]
   }
 }
 
