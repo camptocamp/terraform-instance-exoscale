@@ -39,6 +39,11 @@ variable "domain" {
   type = string
 }
 
+variable "dns_zone" {
+  type    = string
+  default = null
+}
+
 variable "region" {
   type = string
 }
@@ -87,6 +92,14 @@ variable "rancher" {
 # Puppet
 
 variable "puppet" {
+  type    = map(string)
+  default = null
+}
+
+#########
+# FreeIPA
+
+variable "freeipa" {
   type    = map(string)
   default = null
 }
