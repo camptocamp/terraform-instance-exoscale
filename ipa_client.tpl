@@ -2,4 +2,4 @@
 packages:
   - freeipa-client
 runcmd:
-  - ipa-client-install --hostname ${hostname} --unattended --domain ${domain} --password ${password}
+  - until ipa-client-install --hostname ${hostname} --unattended --domain ${domain} --password ${password}; do sleep 15; done
