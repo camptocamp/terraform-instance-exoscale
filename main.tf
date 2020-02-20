@@ -116,7 +116,8 @@ resource "exoscale_compute" "this" {
 }
 
 data "aws_route53_zone" "this" {
-  name = var.dns_zone
+  count = var.freeipa == null ? 0 : 1
+  name  = var.dns_zone
 }
 
 resource "aws_route53_record" "this" {
