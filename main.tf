@@ -116,12 +116,13 @@ resource "exoscale_compute" "this" {
 }
 
 data "aws_route53_zone" "this" {
-  name = var.dns_zone
+  count = var.freeipa == null ? 0 : var.instance_count
+  name  = var.dns_zone
 }
 
 resource "aws_route53_record" "this" {
   count   = var.freeipa == null ? 0 : var.instance_count
-  zone_id = data.aws_route53_zone.this.id
+  zone_id = data.aws_route53_zone.this[0].id
   name    = format("%s-%d.%s", var.display_name, count.index, var.domain)
   type    = "A"
   ttl     = "300"
