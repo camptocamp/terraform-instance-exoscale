@@ -1,4 +1,5 @@
 #cloud-config
+package_upgrade: true
 packages:
   - ipa-client
 runcmd:
