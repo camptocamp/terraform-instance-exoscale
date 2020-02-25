@@ -170,12 +170,13 @@ resource "null_resource" "provisioner" {
         roles_path = ["${path.module}/ansible-data/roles"]
       }
 
-      groups = ["instance"]
-      become = true
-      diff   = true
-      check  = var.ansible_check
+      groups             = ["instance"]
+      become             = true
+      diff               = true
+      check              = var.ansible_check
 
       extra_vars = {
+        INTERPRETER_PYTHON = "auto",
         eth1_address = var.private_network != null ? format("%s/%s", cidrhost(var.private_network.cidr, var.private_network.offset + count.index), cidrnetmask(var.private_network.cidr)) : null
       }
     }
