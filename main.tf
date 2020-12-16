@@ -70,13 +70,13 @@ EOF
     filename     = "additional.cfg"
     merge_type   = "list(append)+dict(recurse_array)+str()"
     content_type = "text/cloud-config"
-    content      = "${var.additional_user_data}"
+    content      = var.additional_user_data
   }
 
   part {
     filename     = "additional.sh"
     content_type = "text/x-shellscript"
-    content      = "${var.additional_user_script}"
+    content      = var.additional_user_script
   }
 }
 
