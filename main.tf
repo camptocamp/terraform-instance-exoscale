@@ -192,7 +192,7 @@ resource "null_resource" "provisioner" {
 # Puppet
 
 module "puppet-node" {
-  source         = "git::https://github.com/camptocamp/terraform-puppet-node.git?reftf-0-13"
+  source         = "git::https://github.com/camptocamp/terraform-puppet-node.git?ref=tf-0-13"
   instance_count = var.puppet == null ? 0 : var.instance_count
 
   instances = [
