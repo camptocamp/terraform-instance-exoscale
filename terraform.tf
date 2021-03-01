@@ -11,13 +11,5 @@ terraform {
     freeipa = {
       source = "camptocamp/freeipa"
     }
-
-    puppetca = {
-      source = "camptocamp/puppetca"
-    }
-
-    puppetdb = {
-      source = "camptocamp/puppetdb"
-    }
   }
 }
