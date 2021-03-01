@@ -4,7 +4,7 @@ terraform {
       source = "exoscale/exoscale"
     }
     freeipa = {
-      source = "camptocamp/freeipa"
+      source  = "camptocamp/freeipa"
       version = "0.7.0"
     }
   }
