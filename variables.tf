@@ -44,11 +44,6 @@ variable "domain" {
   type = string
 }
 
-variable "dns_zone" {
-  type    = string
-  default = null
-}
-
 variable "region" {
   type = string
 }

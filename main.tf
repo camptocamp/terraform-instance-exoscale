@@ -21,23 +21,15 @@ resource "exoscale_nic" "priv_interface" {
   network_id = var.private_network.id
 }
 
-resource "random_password" "ipa_client" {
-  count   = var.freeipa == null ? 0 : var.instance_count
-  length  = 30
-  special = false
-}
-
-data "template_file" "ipa_client" {
+module "freeipa_host" {
   count = var.freeipa == null ? 0 : var.instance_count
 
-  # TODO: fix race condition in runcmd
-  template = file("${path.module}/ipa_client.tpl")
+  source = "git::https://github.com/camptocamp/terraform-freeipa-host.git?ref=v1.x"
 
-  vars = {
-    hostname = format("%s-%d.%s", var.display_name, count.index, var.domain)
-    domain   = var.freeipa != null ? lookup(var.freeipa, "domain", null) : null
-    password = random_password.ipa_client[count.index].result
-  }
+  hostname = format("%s-%d.%s", var.hostname, count.index, var.domain)
+  domain   = var.freeipa != null ? lookup(var.freeipa, "domain", null) : null
+
+  force = true
 }
 
 data "template_cloudinit_config" "config" {
@@ -60,10 +52,10 @@ EOF
   }
 
   part {
-    filename     = "freeipa-client.cfg"
+    filename     = "freeipa.cfg"
     merge_type   = "list(append)+dict(recurse_array)+str()"
     content_type = "text/cloud-config"
-    content      = var.freeipa == null ? "" : data.template_file.ipa_client[count.index].rendered
+    content      = var.freeipa == null ? "" : module.freeipa_host[count.index].cloudinit_config
   }
 
   part {
@@ -114,26 +106,6 @@ resource "exoscale_compute" "this" {
       template_id, # The provider changed the way it manages templates and there's no real backward-compatibility.
     ]
   }
-}
-
-data "aws_route53_zone" "this" {
-  count = var.freeipa == null ? 0 : var.instance_count
-  name  = var.dns_zone
-}
-
-resource "aws_route53_record" "this" {
-  count   = var.freeipa == null ? 0 : var.instance_count
-  zone_id = data.aws_route53_zone.this[0].id
-  name    = format("%s-%d.%s", var.display_name, count.index, var.domain)
-  type    = "A"
-  ttl     = "300"
-  records = [exoscale_compute.this[count.index].ip_address]
-}
-
-resource "freeipa_host" "this" {
-  count        = var.freeipa == null ? 0 : var.instance_count
-  fqdn         = aws_route53_record.this[count.index].fqdn
-  userpassword = random_password.ipa_client[count.index].result
 }
 
 resource "null_resource" "provisioner" {
