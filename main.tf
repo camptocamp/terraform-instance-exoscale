@@ -83,6 +83,7 @@ resource "exoscale_compute" "this" {
   key_pair        = var.key_pair
   display_name    = var.display_name != "" ? format("%s-%s", var.display_name, count.index) : format("ip-%s", join("-", split(".", cidrhost(var.private_network.cidr, var.private_network.offset + count.index))))
   hostname        = var.hostname != "" ? format("%s-%s", var.hostname, count.index) : null
+  reverse_dns     = var.hostname != "" ? format("%s-%d.%s.", var.hostname, count.index, var.domain) : null
   disk_size       = var.root_disk_size
   security_groups = var.security_groups
   size            = var.size
