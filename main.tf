@@ -88,6 +88,7 @@ resource "exoscale_compute" "this" {
   size            = var.size
   template_id     = data.exoscale_compute_template.this.id
   zone            = var.region
+  reverse_dns     = var.reverse_dns
   affinity_groups = [
     exoscale_affinity.affinity_group.name
   ]
