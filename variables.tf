@@ -48,6 +48,10 @@ variable "region" {
   type = string
 }
 
+variable "reverse_dns" {
+  type    = string
+  default = null
+}
 variable "root_disk_size" {
   type    = number
   default = 10
