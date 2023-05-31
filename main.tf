@@ -1,13 +1,5 @@
-resource "random_string" "affinity_group_name" {
-  length  = 16
-  upper   = false
-  number  = false
-  special = false
-}
-
-resource "exoscale_affinity" "affinity_group" {
-  name = random_string.affinity_group_name.result
-  type = "host anti-affinity"
+resource "exoscale_anti_affinity_group" "affinity_group" {
+  name = "${var.hostname}-nodes"
 
   lifecycle {
     ignore_changes = [description]
@@ -90,7 +82,7 @@ resource "exoscale_compute" "this" {
   template_id     = data.exoscale_compute_template.this.id
   zone            = var.region
   affinity_groups = [
-    exoscale_affinity.affinity_group.name
+    exoscale_anti_affinity_group.affinity_group.name
   ]
   user_data = data.template_cloudinit_config.config[count.index].rendered
 
