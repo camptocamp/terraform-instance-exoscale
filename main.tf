@@ -64,6 +64,23 @@ EOF
   }
 }
 
+resource "exoscale_security_group" "this" {
+  name = "${var.hostname}-nodes"
+}
+
+resource "exoscale_security_group_rule" "this" {
+  for_each = var.security_group_rules
+
+  security_group_id = exoscale_security_group.this.id
+
+  type        = each.value.type
+  description = each.value.description
+  protocol    = each.value.protocol
+  cidr        = each.value.cidr
+  start_port  = each.value.start_port
+  end_port    = each.value.end_port
+}
+
 data "exoscale_compute_template" "this" {
   zone = var.region
   name = var.template

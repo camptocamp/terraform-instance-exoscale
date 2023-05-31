@@ -12,6 +12,18 @@ variable "security_group_ids" {
   default = []
 }
 
+variable "security_group_rules" {
+  type = map(object({
+    type        = string
+    description = string
+    protocol    = string
+    cidr        = string
+    start_port  = number
+    end_port    = number
+  }))
+  default = {}
+}
+
 variable "hostname" {
   type    = string
   default = ""
