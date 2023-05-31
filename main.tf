@@ -9,7 +9,7 @@ resource "exoscale_anti_affinity_group" "affinity_group" {
 resource "exoscale_nic" "priv_interface" {
   count = var.private_network != null ? var.instance_count : 0
 
-  compute_id = exoscale_compute.this[count.index].id
+  compute_id = exoscale_compute_instance.this[count.index].id
   network_id = var.private_network.id
 }
 
@@ -69,47 +69,35 @@ data "exoscale_compute_template" "this" {
   name = var.template
 }
 
-resource "exoscale_compute" "this" {
+resource "exoscale_compute_instance" "this" {
   count = var.instance_count
 
-  key_pair        = var.key_pair
-  display_name    = var.display_name != "" ? format("%s-%s", var.display_name, count.index) : format("ip-%s", join("-", split(".", cidrhost(var.private_network.cidr, var.private_network.offset + count.index))))
-  hostname        = var.hostname != "" ? format("%s-%s", var.hostname, count.index) : null
-  reverse_dns     = var.hostname != "" && var.domain != "" ? format("%s-%d.%s.", var.hostname, count.index, var.domain) : null
-  disk_size       = var.root_disk_size
-  security_groups = var.security_groups
-  size            = var.size
-  template_id     = data.exoscale_compute_template.this.id
-  zone            = var.region
-  affinity_groups = [
-    exoscale_anti_affinity_group.affinity_group.name
+  ssh_key     = var.ssh_key
+  name        = var.hostname != "" ? format("%s-%s", var.hostname, count.index) : null
+  reverse_dns = var.hostname != "" && var.domain != "" ? format("%s-%d.%s", var.hostname, count.index, var.domain) : null
+  disk_size   = var.root_disk_size
+  type        = var.type
+  template_id = data.exoscale_compute_template.this.id
+  zone        = var.region
+  user_data   = data.template_cloudinit_config.config[count.index].rendered
+  labels      = var.tags
+
+  anti_affinity_group_ids = [
+    exoscale_anti_affinity_group.affinity_group.id
   ]
-  user_data = data.template_cloudinit_config.config[count.index].rendered
 
-  tags = var.tags
-
-  lifecycle {
-    ignore_changes = [
-      user_data,
-      security_groups,
-      key_pair,
-      affinity_groups,
-      affinity_group_ids,
-      template,
-      template_id, # The provider changed the way it manages templates and there's no real backward-compatibility.
-    ]
-  }
+  security_group_ids = var.security_group_ids
 }
 
 resource "null_resource" "provisioner" {
   count      = var.instance_count
-  depends_on = [exoscale_compute.this, exoscale_nic.priv_interface]
+  depends_on = [exoscale_compute_instance.this, exoscale_nic.priv_interface]
 
   connection {
     type                = lookup(var.connection, "type", null)
     user                = lookup(var.connection, "user", "terraform")
     password            = lookup(var.connection, "password", null)
-    host                = lookup(var.connection, "host", exoscale_compute.this[count.index].ip_address)
+    host                = lookup(var.connection, "host", exoscale_compute_instance.this[count.index].public_ip_address)
     port                = lookup(var.connection, "port", 22)
     timeout             = lookup(var.connection, "timeout", "")
     script_path         = lookup(var.connection, "script_path", null)
@@ -162,11 +150,11 @@ module "puppet-node" {
   instance_count = var.puppet == null ? 0 : var.instance_count
 
   instances = [
-    for i in range(length(exoscale_compute.this)) :
+    for i in range(length(exoscale_compute_instance.this)) :
     {
-      hostname = format("%s.%s", exoscale_compute.this[i].hostname, var.domain)
+      hostname = format("%s.%s", exoscale_compute_instance.this[i].name, var.domain)
       connection = {
-        host        = lookup(var.connection, "host", exoscale_compute.this[i].ip_address)
+        host        = lookup(var.connection, "host", exoscale_compute_instance.this[i].public_ip_address)
         private_key = lookup(var.connection, "private_key", null)
       }
     }

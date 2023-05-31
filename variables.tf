@@ -3,18 +3,13 @@ variable "instance_count" {
   type    = number
 }
 
-variable "key_pair" {
+variable "ssh_key" {
   type = string
 }
 
-variable "security_groups" {
+variable "security_group_ids" {
   type    = list(string)
   default = []
-}
-
-variable "display_name" {
-  type    = string
-  default = ""
 }
 
 variable "hostname" {
@@ -22,7 +17,7 @@ variable "hostname" {
   default = ""
 }
 
-variable "size" {
+variable "type" {
   type = string
 }
 
