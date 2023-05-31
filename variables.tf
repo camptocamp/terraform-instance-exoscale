@@ -77,17 +77,6 @@ variable "ansible_check" {
   default = false
 }
 
-##########
-# Rancher
-
-variable "rancher" {
-  type = object({
-    environment_id = string
-    host_labels    = map(string)
-  })
-  default = null
-}
-
 #########
 # Puppet
 

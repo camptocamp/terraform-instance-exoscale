@@ -190,37 +190,3 @@ module "puppet-node" {
 
   deps_on = null_resource.provisioner[*].id
 }
-
-##########
-# Rancher
-
-module "rancher-host" {
-  source         = "git::https://github.com/camptocamp/terraform-rancher-host.git?ref=v1.x"
-  instance_count = var.rancher == null ? 0 : var.instance_count
-
-  instances = [
-    for i in range(length(exoscale_compute.this)) :
-    {
-      hostname = format("%s.%s", exoscale_compute.this[i].hostname, var.domain)
-      agent_ip = exoscale_compute.this[i].ip_address
-      connection = {
-        host        = lookup(var.connection, "host", exoscale_compute.this[i].ip_address)
-        private_key = lookup(var.connection, "private_key", null)
-      }
-
-      host_labels = merge(
-        var.rancher != null ? var.rancher.host_labels : {},
-        {
-          "io.rancher.host.os"              = "linux"
-          "io.rancher.host.provider"        = "openstack"
-          "io.rancher.host.region"          = var.region
-          "io.rancher.host.external_dns_ip" = exoscale_compute.this[i].ip_address
-        }
-      )
-    }
-  ]
-
-  environment_id = var.rancher != null ? var.rancher.environment_id : ""
-
-  deps_on = var.puppet != null ? module.puppet-node.this_provisioner_id : []
-}
