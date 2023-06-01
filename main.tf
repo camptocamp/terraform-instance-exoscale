@@ -14,12 +14,12 @@ resource "exoscale_nic" "priv_interface" {
 }
 
 module "freeipa_host" {
-  count = var.freeipa == null ? 0 : var.instance_count
+  count = var.freeipa != null ? (var.freeipa.domain != null ? var.instance_count : 0) : 0
 
   source = "git::https://github.com/camptocamp/terraform-freeipa-host.git?ref=v1.x"
 
   hostname = format("%s-%d.%s", var.hostname, count.index, var.domain)
-  domain   = var.freeipa != null ? lookup(var.freeipa, "domain", null) : null
+  domain   = var.freeipa.domain
 
   force = true
 }
@@ -47,7 +47,7 @@ EOF
     filename     = "freeipa.cfg"
     merge_type   = "list(append)+dict(recurse_array)+str()"
     content_type = "text/cloud-config"
-    content      = var.freeipa == null ? "" : module.freeipa_host[count.index].cloudinit_config
+    content      = var.freeipa != null ? (var.freeipa.domain != null ? module.freeipa_host[count.index].cloudinit_config : "") : ""
   }
 
   part {
@@ -104,6 +104,15 @@ resource "exoscale_compute_instance" "this" {
   ]
 
   security_group_ids = var.security_group_ids
+}
+
+resource "freeipa_dns_record" "this" {
+  count = var.freeipa != null ? (var.freeipa.dns_zone != null ? var.instance_count : 0) : 0
+
+  dnszoneidnsname = var.freeipa.dns_zone
+  idnsname        = exoscale_compute_instance.this[count.index].name
+  records         = ["${exoscale_compute_instance.this[count.index].public_ip_address}"]
+  type            = "A"
 }
 
 resource "null_resource" "provisioner" {
