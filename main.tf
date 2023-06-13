@@ -147,7 +147,7 @@ resource "null_resource" "provisioner" {
   provisioner "ansible" {
     plays {
       playbook {
-        file_path  = "${path.module}/ansible-data/playbooks/instance.yml"
+        file_path  = "${path.module}/ansible-data/instance.yml"
         roles_path = ["${path.module}/ansible-data/roles"]
       }
 
