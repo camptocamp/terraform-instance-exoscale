@@ -2,6 +2,10 @@
 - hosts: instance
   gather_facts: false
   pre_tasks:
+    - name: Wait for connection
+      wait_for_connection:
+        delay: 60
+        timeout: 300
     - name: Install Python
       raw: bash -c "(yum -y update && yum install -y python3) || (apt -y update && apt install -y python python3)"
       retries: 3
