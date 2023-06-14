@@ -103,7 +103,7 @@ resource "exoscale_compute_instance" "this" {
     exoscale_anti_affinity_group.affinity_group.id
   ]
 
-  security_group_ids = var.security_group_ids
+  security_group_ids = concat(var.security_group_ids, [exoscale_security_group.this.id])
 }
 
 resource "freeipa_dns_record" "this" {
@@ -114,6 +114,7 @@ resource "freeipa_dns_record" "this" {
   records         = ["${exoscale_compute_instance.this[count.index].public_ip_address}"]
   dnsttl          = 300
   type            = "A"
+  depends_on      = [null_resource.provisioner]
 }
 
 resource "null_resource" "provisioner" {
