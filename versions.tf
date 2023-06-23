@@ -5,7 +5,6 @@ terraform {
     }
     freeipa = {
       source  = "camptocamp/freeipa"
-      version = "0.7.0"
     }
   }
 
