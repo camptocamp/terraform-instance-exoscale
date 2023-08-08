@@ -104,6 +104,12 @@ resource "exoscale_compute_instance" "this" {
   ]
 
   security_group_ids = concat(var.security_group_ids, [exoscale_security_group.this.id])
+
+  lifecycle {
+    ignore_changes = [
+      template_id,
+    ]
+  }
 }
 
 resource "freeipa_dns_record" "this" {
