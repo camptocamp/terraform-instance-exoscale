@@ -81,7 +81,7 @@ resource "exoscale_security_group_rule" "this" {
   end_port    = each.value.end_port
 }
 
-data "exoscale_compute_template" "this" {
+data "exoscale_template" "this" {
   zone = var.region
   name = var.template
 }
@@ -94,7 +94,7 @@ resource "exoscale_compute_instance" "this" {
   reverse_dns = var.hostname != "" && var.domain != "" ? format("%s-%d.%s", var.hostname, count.index, var.domain) : null
   disk_size   = var.root_disk_size
   type        = var.type
-  template_id = data.exoscale_compute_template.this.id
+  template_id = data.exoscale_template.this.id
   zone        = var.region
   user_data   = data.template_cloudinit_config.config[count.index].rendered
   labels      = var.tags
