@@ -6,13 +6,6 @@ resource "exoscale_anti_affinity_group" "affinity_group" {
   }
 }
 
-resource "exoscale_nic" "priv_interface" {
-  count = var.private_network != null ? var.instance_count : 0
-
-  compute_id = exoscale_compute_instance.this[count.index].id
-  network_id = var.private_network.id
-}
-
 module "freeipa_host" {
   count = var.freeipa != null ? (var.freeipa.domain != null ? var.instance_count : 0) : 0
 
@@ -105,6 +98,13 @@ resource "exoscale_compute_instance" "this" {
 
   security_group_ids = concat(var.security_group_ids, [exoscale_security_group.this.id])
 
+  dynamic "network_interface" {
+    for_each = var.private_network != null ? [1] : []
+    content {
+      network_id = var.private_network.id
+    }
+  }
+
   lifecycle {
     ignore_changes = [
       template_id,
@@ -125,7 +125,7 @@ resource "freeipa_dns_record" "this" {
 
 resource "null_resource" "provisioner" {
   count      = var.instance_count
-  depends_on = [exoscale_compute_instance.this, exoscale_nic.priv_interface]
+  depends_on = [exoscale_compute_instance.this]
 
   connection {
     type                = lookup(var.connection, "type", null)
