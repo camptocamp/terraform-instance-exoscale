@@ -31,6 +31,11 @@ variable "hostname" {
 
 variable "type" {
   type = string
+  description = <<-EOT
+  The instance type (<family>.<size>, e.g. standard.medium;
+  use the Exoscale CLI - exo compute instance-type list - for the list of available types).
+  WARNING: updating this attribute stops/restarts the instance."
+  EOT
 }
 
 variable "template" {
