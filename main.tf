@@ -6,17 +6,6 @@ resource "exoscale_anti_affinity_group" "affinity_group" {
   }
 }
 
-module "freeipa_host" {
-  count = var.freeipa != null ? (var.freeipa.domain != null ? var.instance_count : 0) : 0
-
-  source = "git::https://github.com/camptocamp/terraform-freeipa-host.git?ref=v1.x"
-
-  hostname = format("%s-%d.%s", var.hostname, count.index, var.domain)
-  domain   = var.freeipa.domain
-
-  force = true
-}
-
 data "template_cloudinit_config" "config" {
   count = var.instance_count
 
@@ -34,13 +23,6 @@ system_info:
   default_user:
     name: terraform
 EOF
-  }
-
-  part {
-    filename     = "freeipa.cfg"
-    merge_type   = "list(append)+dict(recurse_array)+str()"
-    content_type = "text/cloud-config"
-    content      = var.freeipa != null ? (var.freeipa.domain != null ? module.freeipa_host[count.index].cloudinit_config : "") : ""
   }
 
   part {
@@ -110,17 +92,6 @@ resource "exoscale_compute_instance" "this" {
       template_id,
     ]
   }
-}
-
-resource "freeipa_dns_record" "this" {
-  count = var.freeipa != null ? (var.freeipa.dns_zone != null ? var.instance_count : 0) : 0
-
-  dnszoneidnsname = var.freeipa.dns_zone
-  idnsname        = exoscale_compute_instance.this[count.index].name
-  records         = ["${exoscale_compute_instance.this[count.index].public_ip_address}"]
-  dnsttl          = 300
-  type            = "A"
-  depends_on      = [null_resource.provisioner]
 }
 
 resource "null_resource" "provisioner" {

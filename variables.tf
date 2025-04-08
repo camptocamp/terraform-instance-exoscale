@@ -91,14 +91,3 @@ variable "puppet" {
   type    = map(string)
   default = null
 }
-
-#########
-# FreeIPA
-
-variable "freeipa" {
-  type = object({
-    domain   = optional(string, null)
-    dns_zone = optional(string, null)
-  })
-  default = null
-}
