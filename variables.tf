@@ -3,8 +3,9 @@ variable "instance_count" {
   type    = number
 }
 
-variable "ssh_key" {
-  type = string
+variable "ssh_keys" {
+  type        = set(string)
+  description = "The list of exoscale_ssh_key (name) to authorize in the instance (may only be set at creation time)."
 }
 
 variable "security_group_ids" {

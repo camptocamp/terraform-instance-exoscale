@@ -64,7 +64,7 @@ data "exoscale_template" "this" {
 resource "exoscale_compute_instance" "this" {
   count = var.instance_count
 
-  ssh_key     = var.ssh_key
+  ssh_keys    = var.ssh_keys
   name        = var.hostname != "" ? format("%s-%s", var.hostname, count.index) : null
   reverse_dns = var.hostname != "" && var.domain != "" ? format("%s-%d.%s", var.hostname, count.index, var.domain) : null
   disk_size   = var.root_disk_size
